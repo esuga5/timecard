@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout/layout}">
+
+<head>
+    <title>ユーザー詳細</title>
+</head>
+
+<body>
+    <a class="dropdown-item" th:href="@{{selectBack}(selectBack=${selectBack})}" layout:fragment="back">戻る</a>
+    <div class="container" layout:fragment="content">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header text-white bg-info" th:text="${cardtitle}"></div>
+                    <div class="card-body">
+                        <!-- ユーザー情報入力フォーム -->
+                        <form method="POST" th:action="@{/user/{action}(action=${action})}" th:object="${userForm}" onSubmit="return formConfirm()">
+                            <!-- 所属選択フォーム -->
+                            <div class="form-group">
+                                <label for="sectionCode">所属:</label>
+                                <select id="sectionCode" name="sectionCode" th:class="'form-control' + (${#fields.hasErrors('sectionCode')} ? ' is-invalid' : '')"
+                                        th:field="*{sectionCode}" th:disabled="${disabled}">
+                                    <option value="" selected>選択してください</option>
+                                    <option th:each="section: ${sectionList}" th:value="${section.getCode()}" th:text="${section.getSectionName()}"></option>
+                                </select>
+                            </div>
+                            <!-- 入社日選択フォーム -->
+                            <div class="form-group">
+                                <label for="nyuusyabi">入社日:</label>
+                                <input id="joinedAt" name="joinedAt" type="date" min="2000-01-01" max="2999-12-31" th:class="'form-control' + (${#fields.hasErrors('joinedAt')} ? ' is-invalid' : '')"
+                                        th:field="*{joinedAt}" th:disabled="${disabled}" required>
+                                <div class="invalid-feedback" role="alert" th:if="${#fields.hasErrors('joinedAt')}" th:errors="*{joinedAt}"></div>
+                            </div>
+                            <!-- 氏名入力フォーム -->
+                            <div class="form-group">
+                                <label for="displayName">氏名:</label>
+                                <input id="displayName" name="displayName" type="text" th:class="'form-control' + (${#fields.hasErrors('displayName')} ? ' is-invalid' : '')"
+                                        th:field="*{displayName}" placeholder="氏名" th:disabled="${disabled}" required>
+                                <div class="invalid-feedback" role="alert" th:if="${#fields.hasErrors('displayName')}" th:errors="*{displayName}"></div>
+                            </div>
+                            <!-- メールアドレス入力フォーム -->
+                            <div class="form-group">
+                                <label for="username">メールアドレス:</label>
+                                <input id="username" name="username" type="email" th:class="'form-control' + (${#fields.hasErrors('username')} ? ' is-invalid' : '')"
+                                        th:field="*{username}" placeholder="メールアドレス" th:disabled="${disabled}" required>
+                                <div class="invalid-feedback" role="alert" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+                            </div>
+                            <!-- パスワード入力フォーム -->
+                            <div class="form-group">
+                                <label for="password" th:text="${passwordFormTitle}"></label>
+                                <input type="password" id="password" name="password"
+                                        th:class="'form-control' + (${#fields.hasErrors('password') || #fields.hasErrors('checkPassword')} ? ' is-invalid' : '')"
+                                        placeholder="パスワード" th:required="${action} != 'update'">
+                                <div class="invalid-feedback" role="alert" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                                <div class="invalid-feedback" role="alert" th:if="${#fields.hasErrors('checkPassword')}" th:errors="*{checkPassword}"></div>
+                            </div>
+                            <!-- パスワード確認フォーム -->
+                            <div class="form-group">
+                                <label for="confirmPassword">パスワード(確認):</label>
+                                <input type="password" id="confirmPassword" name="confirmPassword"
+                                        th:class="'form-control' + (${#fields.hasErrors('matchPassword')} ? ' is-invalid' : '')"
+                                        placeholder="パスワード"  th:required="${action} != 'update'">
+                                <div class="invalid-feedback" role="alert" th:if="${#fields.hasErrors('matchPassword')}" th:errors="*{matchPassword}"></div>
+                            </div>
+                            <!-- 権限選択フォーム -->
+                            <div class="form-group">
+                                <label for="adminFlag">権限:</label>
+                                <select id="adminFlag" name="adminFlag" th:class="'form-control' + (${#fields.hasErrors('adminFlag')} ? ' is-invalid' : '')"
+                                        th:field="*{adminFlag}" th:disabled="${disabled}" required>
+                                    <option value="false">一般</option>
+                                    <option value="true">管理者</option>
+                                </select>
+                            </div>
+                            <!-- 送信ボタン -->
+                            <div class=" form-group row mb-0">
+                                <div class="col-md-12 text-right">
+                                    <input type="hidden" id="id" name="id" th:field="*{id}">
+                                    <button type="submit" class="btn bg-info text-white w-25" th:text="${buttontext}"></button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

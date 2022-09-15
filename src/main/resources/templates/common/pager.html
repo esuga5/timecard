@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<body>
+    <div id="pager" layout:fragment="pager">
+        <ul class="pagination justify-content-center" role="navigation">
+
+            <!--/* 前のページへのリンク */-->
+            <li th:if="${pager.first}" class="page-item disabled" aria-disabled="true" aria-label="前のページ">
+                <span class="page-link" aria-hidden="true">&lt;</span>
+            </li>
+            <li th:if="${!pager.first}" class="page-item">
+                <a class="page-link" th:href="@{/user/list(page=${pager.number})}" rel="prev"
+                    aria-label="前のページ">&lt;</a>
+            </li>
+
+            <!--/* 最初のページへのリンク */-->
+            <li th:if="${pager.number}>2" class="page-item">
+                <a class="page-link" th:href="@{/user/list(page=1)}" rel="first" aria-label="最初のページ">1</a>
+            </li>
+
+            <!--/* ページごとの処理 */-->
+            <th:block th:each="i : ${#numbers.sequence(1, pager.totalPages)}">
+                <!--/* 現在ページの 3 つ前と 3 つ後は省略記号「…」 */-->
+                <li th:if="((${i}==(${pager.number}-2)) and (${pager.number}>3))
+                        or ((${i}==(${pager.number}+4)) and (${pager.number}<(${pager.totalPages}-4)))"
+                        class="page-item disabled" aria-disabled="true">
+                    <span class="page-link">…</span>
+                </li>
+                <!--/* 現在ページの前後 2 つはリンク */-->
+                <li th:if="(${i}>(${pager.number}-2)) and (${i}<(${pager.number}+4))
+                        and (${i}!=(${pager.number}+1))"
+                        class="page-item">
+
+                    <a class="page-link" th:href="@{/user/list(page=${i})}" th:text="${i}"></a>
+                </li>
+
+                <!--/* 現在ページ */-->
+                <li th:if="${i}==(${pager.number}+1)" class="page-item active" aria-current="page">
+                    <span class="page-link" th:text="${i}"></span>
+                </li>
+            </th:block>
+
+            <!--/* 最後のページへのリンク */-->
+            <li th:if="${pager.number}<(${pager.totalPages}-3)" class="page-item">
+                <a class="page-link" th:href="@{/user/list(page=${pager.totalPages})}"
+                        rel="last" aria-label="最後のページ"th:text="${pager.totalPages}">
+                </a>
+            </li>
+
+            <!--/* 次のページへのリンク */-->
+            <li th:if="${pager.last}" class="page-item disabled" aria-disabled="true" aria-label="次のページ">
+                <span class="page-link" aria-hidden="true">&gt;</span>
+            </li>
+            <li th:if="${!pager.last}" class="page-item">
+                <a class="page-link" th:href="@{/user/list(page=(${pager.number}+2))}"
+                        rel="next" aria-label="次のページ">&gt;</a>
+            </li>
+        </ul>
+    </div>
+</body>
+
+</html>

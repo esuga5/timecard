@@ -1,0 +1,17 @@
+{"properties": [
+  {
+    "name": "timecard.constants.start-date",
+    "type": "java.lang.String",
+    "description": "Start date of this application."
+  },
+  {
+    "name": "timecard.constants.max-end-time",
+    "type": "java.lang.String",
+    "description": "End time of day(in minutes)."
+  },
+  {
+    "name": "timecard.constants.time-period",
+    "type": "java.lang.String",
+    "description": "Time period of day(in minutes)."
+  }
+]}

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout/layout}">
+
+<head>
+    <title layout:title-pattern="$LAYOUT_TITLE | $CONTENT_TITLE">TimeCard</title>
+</head>
+
+<body>
+    <a class="dropdown-item" th:href="@{/}" layout:fragment="back">戻る</a>
+    <div class="container" layout:fragment="content">
+        <div class="row justify-content-center">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header text-white bg-info d-flex justify-content-between align-items-center">
+                        <div>ユーザー一覧</div>
+                        <div class="">
+                            <a class="btn btn-warning text-light" th:href="@{/user/new}">ユーザー追加</a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="mx-auto col-8 mb-4 mt-4">
+                            <div layout:replace="~{common/ymselect::form}"></div>
+                        </div>
+                        <!-- <div class="mb-3" th:if="${list.size()>0}">
+                            <div layout:replace="~{common/pager::pager}"></div>
+                        </div> -->
+                        <table class="table table-bordered table-hover text-nowrap" id="dataTable">
+                            <thead class="bg-info text-white text-center">
+                                <tr>
+                                    <th scope="col">ユーザー名</th>
+                                    <th scope="col">入社日<span class="text-right">&nbsp;&nbsp;&uarr;&darr;</span></th>
+                                    <th scope="col">所属<span class="text-right">&nbsp;&nbsp;&uarr;&darr;</span></th>
+                                    <th scope="col">権限<span class="text-right">&nbsp;&nbsp;&uarr;&darr;</span></th>
+                                    <th scope="col">各種機能</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-sm">
+                                <tr class="text-center" th:each="user : ${list} ">
+                                    <th scope="row" class="align-middle text-left pl-3" th:text="${user.displayName}">
+                                    </th>
+                                    <td class="align-middle" th:text="${customDateFormat.format(user.joinedAt)}">
+                                    </td>
+                                    <td class="align-middle text-left pl-3"
+                                        th:text="${user.sectionCode} != '' ? ${user.section.sectionName} : ''">
+                                    </td>
+                                    <td class="align-middle" th:if="${user.adminFlag}==true">管理者</td>
+                                    <td class="align-middle" th:if="${user.adminFlag}==false"></td>
+                                    <td class="align-middle">
+                                        <a class="btn btn-sm btn-outline-info"
+                                            th:href="@{/show/{id}(id=${user.id})}">勤務表</a>
+                                        <a class="btn btn-sm btn-outline-warning"
+                                            th:href="@{/user/edit/{id}(id=${user.id})}">変更</a>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteByUserId(this)"
+                                            th:attr="data-name=${user.displayName},data-user-id=${user.id}">削除</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<body>
+    <form method="GET" th:action="${action} == 'csvExport' ? @{/export/csv} : ''" layout:fragment="form">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <label for="ym" class="input-group-text bg-info text-light label-width">年月</label>
+            </div>
+            <th:block th:if="${action} != 'csvExport'">
+                <select id="ym" name="ym" class="form-control" onchange="submit(this.form);">
+            </th:block>
+            <th:block th:if="${action} == 'csvExport'">
+                <select id="ym" name="ym" class="form-control">
+            </th:block>
+            <optgroup th:each="optgroup : ${ymselect}" th:label="${optgroup.getKey()}">
+                <option th:each="option : ${optgroup.getValue()}" th:value="${option.getValue()}" th:text="${option.getText()}"></option>
+            </optgroup>
+            </select>
+            <input th:if="${action} != 'csvExport'" type="button" class="btn btn-outline-success ml-1" onclick="location.reload();" value="再読込">
+            <input th:if="${action} == 'csvExport'" type="submit" class="btn btn-outline-success ml-1" name="filename" value="CSV出力">
+
+        </div>
+    </form>
+</body>
+
+</html>

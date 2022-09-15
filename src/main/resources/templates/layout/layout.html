@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <title layout:title-pattern="$LAYOUT_TITLE | $CONTENT_TITLE">TimeCard</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+
+<body>
+    <!--/* 共通テンプレートのheader.html読み込み */-->
+    <div layout:replace="~{layout/header::header}"></div>
+    <div class="py-4">
+        <div layout:fragment="content"></div>
+    </div>
+
+    <script th:src="@{/js/scripts.js}"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js">
+    </script>
+    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+    <script th:src="@{/js/timecard.js}"></script>
+    <script>
+        $(function () {
+            // datatableの設定を変更
+            $("#dataTable").DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Japanese.json",
+                    "sInfo": "_START_ ~ _END_ / 全 _TOTAL_ ユーザー"
+                },
+                "sScrollX": "100%",
+                "sScrollXInner": "100%",
+                "columns": [{
+                        "orderable": false
+                    },
+                    null,
+                    null,
+                    null,
+                    {
+                        "orderable": false,
+                        "searchable": false
+                    }
+                ],
+                "dom": "<'row'<'col-md-3'l><'col-md-6 center'p><'col-md-3 right'f>>" +
+                    "<'row'<'col-12'tr>>" +
+                    "<'row'<'col-sm-3'i>>"
+                // "lengthChange": false
+
+            });
+        });
+    </script>
+
+</body>
+
+</html>

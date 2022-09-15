@@ -1,0 +1,69 @@
+@charset "UTF-8";
+
+html {
+    overflow-y: initial;
+}
+
+.font-small {
+    font-size: 0.8rem;
+}
+
+.font-sm {
+    font-size: 0.7rem;
+}
+
+.btn-font-sm {
+    font-size: 0.6rem;
+}
+
+.label-width {
+    width: 90px;
+    display: inline-block;
+}
+
+.viewDate {
+    background-color: white !important;
+}
+
+.table-th-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bg_light_gray {
+    background-color: #f2f2f2;
+}
+
+td {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2rem;
+}
+
+td.remarks {
+    justify-content: left;
+}
+
+.form-group {
+    margin-bottom: 5px;
+}
+
+.default-form-group {
+    margin-bottom: 1rem;
+}
+
+#defaultTimeButton>span {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 4rem;
+    margin: auto;
+}
+
+/* bootstrap 上書き */
+.table-hover tbody tr:hover {
+    color: #212529;
+    background-color: #e8f0fe;
+}

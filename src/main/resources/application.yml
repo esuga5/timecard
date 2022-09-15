@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/timecard
+    username: postgres
+    password: secret
+    driver-class-name: org.postgresql.Driver
+  data:
+    web:
+      pageable:
+        default-page-size: 20
+        one-indexed-parameters: true
+timecard:
+  constants:
+    start-date: # 運用開始日時
+      2020-04-01
+    max-end-time: # 勤務時間選択プルダウン最大値
+      1440
+    time-period: # 勤務時間選択プルダウンを30分単位でずらす用
+      30
+
+  # datasource:
+  #   url: jdbc:postgresql://ec2-52-202-22-140.compute-1.amazonaws.com
+  #   username: dhtsdwykcteynl
+  #   password: 8ecb5984d97051cd7b3e14f0c96833a0f3ec2af228f9bb665a69828d90e79f92
+  #   driver-class-name: org.postgresql.Driver

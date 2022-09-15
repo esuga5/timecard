@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<body>
+    <header layout:fragment="header">
+        <nav class="navbar navbar-expand-md navbar-light bg-info text-light py-4">
+            <div class="container">
+                <h1 class="font-weight-bold text-uppercase">
+                    <!--/* ロゴが出来次第入れ替え */-->
+                    <a href="/" class="text-decoration-none text-light">TimeCard</a>
+                </h1>
+                <button class="navbar-toggler" type="button" data-toggle="collapse"
+                    data-target="#navbarSupportedContent" aria-expanded="false" aria-controls="navbarSupportedContent"
+                    aria-label="Toggle navigation" th:if="${displayName}">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ml-auto">
+                        <!--/* ログイン画面のみ未表示 */-->
+                        <li class="nav-item dropdown" th:if="${displayName}">
+                            <a id="navbarDropdown" class="nav-link dropdown-toggle text-light" href="#"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button"
+                                th:text="${displayName}">
+                                <span class="caret"></span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                <!--/* 勤務表画面以外では使用不可 */-->
+                                <a layout:fragment="change_password"></a>
+                                <a layout:fragment="management"></a>
+                                <!--/* 全ページ共通 */-->
+                                <a layout:fragment="back"></a>
+                                <a class="dropdown-item" th:href="@{/logout}">ログアウト</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+</body>
+
+</html>

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout/layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timecard</title>
+    <link rel="stylesheet" th:href="@{/css/timecard/timecard.css}">
+</head>
+
+<body>
+    <a class="dropdown-item" th:href="@{/user/password}" th:if="${action} != 'show'"
+        layout:fragment="change_password">パスワード変更</a>
+    <a class="dropdown-item" th:href="@{/user/list}" th:if="${adminFlag}" layout:fragment="management">ユーザー管理</a>
+    <div class="container" layout:fragment="content">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 px-lg-0">
+                    <div class="d-flex flex-column">
+                        <!-- デフォルト設定エリア -->
+                        <div class="mb-4 mx-2" th:if="${action} != 'show'">
+                            <!--/* 通常モードの場合 */-->
+                            <div class="card text-white">
+                                <div class="card-header bg-info text-center">デフォルト設定</div>
+                                <div class="card-body">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"
+                                        id="csrf">
+                                    <form th:object="${defaultTimeForm}" id="defaultTimeForm">
+                                        <!-- デフォルト出勤時間 -->
+                                        <div class="form-group default-form-group row">
+                                            <div class="input-group col-lg-12 mx-lg-0 px-lg-1 col-md-7 mx-md-auto">
+                                                <div class="input-group-prepend">
+                                                    <label for="defaultStartTime"
+                                                        class="input-group-text text-white bg-info">出勤時間</label>
+                                                </div>
+                                                <select class="form-control costom-select"
+                                                    th:field="*{defaultStartTime}" id="defaultStartTime">
+                                                    <option th:each="time,list:${timeList}"
+                                                        th:text="${@helper.timeFormat(time)}" th:value="${time}"
+                                                        th:selected="${time} == ${defaultTimeForm.defaultStartTime}">
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <!-- デフォルト退勤時間 -->
+                                        <div class="form-group default-form-group row">
+                                            <div class="input-group col-lg-12 mx-lg-0 px-lg-1 col-md-7 mx-md-auto">
+                                                <div class="input-group-prepend">
+                                                    <label for="defaultEndTime"
+                                                        class="input-group-text text-white bg-info">退勤時間</label>
+                                                </div>
+                                                <select class="form-control costom-select" th:field="*{defaultEndTime}"
+                                                    id="defaultEndTime">
+                                                    <option th:each="time,list:${timeList}"
+                                                        th:text="${@helper.timeFormat(time + timePeriod)}"
+                                                        th:value="${time + timePeriod}"
+                                                        th:selected="${time} == ${defaultTimeForm.defaultEndTime}">
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <!-- デフォルト休憩時間 -->
+                                        <div class="form-group default-form-group row">
+                                            <div class="input-group col-lg-12 mx-lg-0 px-lg-1 col-md-7 mx-md-auto">
+                                                <div class="input-group-prepend">
+                                                    <label for="defaultBreakTime"
+                                                        class="input-group-text text-white bg-info">休憩時間</label>
+                                                </div>
+                                                <select class="form-control costom-select"
+                                                    th:field="*{defaultBreakTime}" id="defaultBreakTime">
+                                                    <option th:each="time,list:${timeList}"
+                                                        th:text="${@helper.timeFormat(time)}" th:value="${time}"
+                                                        th:selected="${time} == ${defaultTimeForm.defaultBreakTime}">
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <!-- 保存ボタン -->
+                                        <div class="text-center">
+                                            <button type="button" class="btn btn-outline-info position-relative w-50"
+                                                id="defaultTimeButton">保存</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <!--/* 管理者権限ありの場合 */-->
+                        <div class="mb-4 mx-2 row" th:if="${action} == 'show'">
+                            <div class="form-group col-12 px-0">
+                                <a class="form-control btn btn-outline-secondary" th:href="@{/user/list}">戻る</a>
+                            </div>
+                        </div>
+                        <!-- お知らせエリア-->
+                        <div class="mb-4 mx-2">
+                            <div class="card">
+                                <div class="card-header bg-info text-white text-center">お知らせ</div>
+                                <div class="card-body">
+                                    <ul class="list-group list-group-flush font-sm">
+                                        <!-- 追加お知らせ -->
+                                        <li th:if="${user.news} != ''" th:text="${user.news}"
+                                            class="list-group-item px-0"></li>
+                                        <!-- デフォルトお知らせ -->
+                                        <li class="list-group-item px-0">※出勤時間が平常ではない時、連絡は事前に行うことを原則とします。</li>
+                                        <li class="list-group-item px-0">※休暇・欠勤・遅刻・早退等の場合は、備考欄に理由を記述してください。</li>
+                                        <li class="list-group-item px-0">※出社から退社時間を30分単位で記述してください。</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-9">
+                    <div class="d-flex flex-column">
+                        <!-- 勤務表情報エリア -->
+                        <div class="mb-4 mx-2">
+                            <div class="d-flex flex-column">
+                                <div class="d-flex flex-row row">
+                                    <!-- 表示年月プルダウン -->
+                                    <div class="form-group col-8">
+                                        <div class="input-group">
+                                            <div layout:replace="~{common/ymselect::form}"></div>
+                                        </div>
+                                    </div>
+                                    <!-- Excelダウンロードボタン -->
+                                    <div class="form-group col-4 text-right">
+                                        <a class="btn btn-outline-success" th:if="${action} != 'show'"
+                                            th:href="@{/export/excel?ym={yyyymm}(yyyymm=${ym})}">Excelダウンロード</a>
+                                        <a class="btn btn-outline-success" th:if="${action} == 'show'"
+                                            th:href="@{/export/excel/{id}?ym={yyyymm}(id=${user.id}, yyyymm=${ym})}">Excelダウンロード</a>
+                                    </div>
+                                </div>
+                                <!-- 会社名表示欄 -->
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text text-white bg-info label-width">会社名</label>
+                                        </div>
+                                        <input class="form-control viewDate" type="text"
+                                            th:value="${user.section.sectionName}" disabled></input>
+                                    </div>
+                                </div>
+                                <!-- 氏名表示欄 -->
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text text-white bg-info label-width">氏名</label>
+                                        </div>
+                                        <input class="form-control viewDate" type="text" th:value="${user.displayName}"
+                                            disabled></input>
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-row row">
+                                    <th:block th:with="view = ${timeCardRecordViews.get(0)}">
+                                        <!-- 総出勤日数欄 -->
+                                        <div class="form-group col-lg-3">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <label
+                                                        class="input-group-text text-white bg-info label-width">出勤日数</label>
+                                                </div>
+                                                <input class="form-control viewDate" type="text"
+                                                    th:value="${view.totalDate}" disabled></input>
+                                            </div>
+                                        </div>
+                                        <!-- 総就労時間欄 -->
+                                        <div class="form-group col-lg-3 pl-lg-0">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <label
+                                                        class="input-group-text text-white bg-info label-width">就労時間</label>
+                                                </div>
+                                                <input class="form-control viewDate" type="text"
+                                                    th:value="${@helper.timeFormat(view.totalWorkingHours)}"
+                                                    disabled></input>
+                                            </div>
+                                        </div>
+                                        <!-- 総実就労時間欄 -->
+                                        <div class="form-group col-lg-3 pl-lg-0">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <label
+                                                        class="input-group-text text-white bg-info px-1">実就労時間</label>
+                                                </div>
+                                                <input class="form-control viewDate" type="text"
+                                                    th:value="${@helper.timeFormat(view.totalActualWorkingHours)}"
+                                                    disabled></input>
+                                            </div>
+                                        </div>
+                                        <!-- 残業時間 -->
+                                        <div class="form-group col-lg-3 pl-lg-0">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text text-white bg-danger px-1
+                                                        label-width">残業時間</label>
+                                                </div>
+                                                <th:block th:with="overTime = ${view.totalActualWorkingHours - (view.totalDate * 8 * 60)},
+                                                            overTimeCheck = ${overTime} > 0 ? ${overTime} : 0">
+                                                    <input class="form-control viewDate" type="text"
+                                                        th:value="${@helper.timeFormat(overTimeCheck)}"
+                                                        disabled></input>
+                                                </th:block>
+                                            </div>
+                                        </div>
+                                    </th:block>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 勤怠入力シート -->
+                        <div class="mb-4 mx-2">
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered table-hover overflow-auto">
+                                    <!-- 表見出し -->
+                                    <thead>
+                                        <tr class="text-white bg-info font-sm d-flex">
+                                            <th scope="col" colspan="2" class="col-2 table-th-center">日付</th>
+                                            <th scope="col" class="col-1 table-th-center">出勤<br>時間</th>
+                                            <th scope="col" class="col-1 table-th-center">退勤<br>時間</th>
+                                            <th scope="col" class="col-1 table-th-center">休憩<br>時間</th>
+                                            <th scope="col" class="col-1 table-th-center">就労<br>時間</th>
+                                            <th scope="col" class="col-1 table-th-center">実就労<br>時間</th>
+                                            <th scope="col" class="col-3 table-th-center">備考</th>
+                                            <th scope="col" colspan="2" class="col-2 table-th-center">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <!-- 表中身 -->
+                                    <tbody>
+                                        <th:block th:each="timeCardRecordViews :${timeCardRecordViews}"
+                                            th:object="${timeCardRecordViews}">
+                                            <th:block th:switch="*{weekDay}">
+                                                <tr th:case="土" class="font-sm d-flex bg_light_gray">
+                                                <tr th:case="日" class="font-sm d-flex bg_light_gray">
+                                                <tr th:case="*"
+                                                    th:class="*{holidayName} != '' ? 'font-sm d-flex bg_light_gray':'font-sm d-flex'">
+                                            </th:block>
+                                            <!--/* 編集ボタン用変数 */-->
+                                            <th:block th:with="
+                                                id = *{timeCardRecordDto} ? *{timeCardRecordDto.getId()} : '',
+                                                day = *{day},
+                                                daySplit = ${day.split('-', 0)},
+                                                date = ${#dates.create(daySplit[0],daySplit[1],daySplit[2])},
+                                                dialogDate = ${#dates.format(date, 'yyyy/MM/dd')},
+                                                weekDay = *{weekDay},
+                                                startTime = *{timeCardRecordDto} ? *{timeCardRecordDto.getStartTime()} : 'null',
+                                                modalStartTime = *{timeCardRecordDto} ? ${startTime} : ${user.defaultStartTime},
+                                                endTime = *{timeCardRecordDto} ? *{timeCardRecordDto.getEndTime()} : 'null',
+                                                modalEndTime = *{timeCardRecordDto} ? ${endTime} : ${user.defaultEndTime},
+                                                breakTime = *{timeCardRecordDto} ? *{timeCardRecordDto.getBreakTime()} : 'null',
+                                                modalBreakTime = *{timeCardRecordDto} ? ${breakTime} : ${user.defaultBreakTime},
+                                                remarks = *{timeCardRecordDto} ? *{timeCardRecordDto.getRemarks()} : *{holidayName}">
+                                                <!--/* 通常ボタン用変数 */-->
+                                                <th:block th:with="
+                                                    textDate = ${#dates.format(date, 'dd')},
+                                                    valueDate = ${#dates.format(date, 'yyyy-MM-dd')},
+                                                    formatStartTime = ${startTime} != 'null' ? ${@helper.timeFormat(startTime)} : '',
+                                                    formatEndTime = ${endTime} != 'null' ? ${@helper.timeFormat(endTime)} : '',
+                                                    formatBreakTime = ${breakTime} != 'null' ? ${@helper.timeFormat(breakTime)} : '',
+                                                    overTime = *{timeCardRecordDto} ? *{timeCardRecordDto.overTime} : '0'">
+                                                    <!-- 日付エリア -->
+                                                    <td class="col-1 font-weight-bold" th:text="${textDate}"></td>
+                                                    <!-- 曜日エリア -->
+                                                    <th:block th:switch="${weekDay}">
+                                                        <td th:case="土" th:text="${weekDay}" class="col-1 font-weight-bold text-primary">
+                                                        <td th:case="日" th:text="${weekDay}" class="col-1 font-weight-bold text-danger">
+                                                        <td th:case="*" th:text="${weekDay}" th:class="*{holidayName} != '' ? 'col-1 font-weight-bold text-danger':'col-1 font-weight-bold'">
+                                                        </td>
+                                                    </th:block>
+                                                    <!-- 出勤時間エリア -->
+                                                    <td class="col-1"
+                                                        th:classappend="${#strings.contains(overTime,'1')} ? 'text-danger font-weight-bold' : ''" th:text="${formatStartTime}" th:attr="data-id=${startTime}" th:id="${textDate} + 'start'"></td>
+                                                    <!-- 退勤時間エリア -->
+                                                    <td class="col-1"
+                                                        th:classappend="${#strings.contains(overTime,'2')} ? 'text-danger font-weight-bold' : ''" th:text="${formatEndTime}" th:attr="data-id=${endTime}" th:id="${textDate} + 'end'"></td>
+                                                    <!-- 休憩時間エリア -->
+                                                    <td class="col-1"
+                                                        th:classappend="${#strings.contains(overTime,'3')} ? 'text-danger font-weight-bold' : ''" th:text="${formatBreakTime}" th:attr="data-id=${breakTime}" th:id="${textDate} + 'break'"></td>
+                                                    <!-- 就労時間エリア -->
+                                                    <td class="col-1" th:text="*{workingHours} != '0' ? ${@helper.timeFormat(__*{workingHours}__)} : ''"></td>
+                                                    <!-- 実就労時間エリア -->
+                                                    <td class="col-1" th:text="*{actualWorkingHours} != '0' ? ${@helper.timeFormat(__*{actualWorkingHours}__)} : ''"></td>
+                                                    <!-- 備考エリア -->
+                                                    <td class="col-3 remarks" th:text="${remarks}"></td>
+                                                    <!--/* 通常モードだったら */-->
+                                                    <th:block th:if="${action} != 'show'">
+                                                        <!--/* 通常ボタン */-->
+                                                        <td class="col-1 py-1" th:if="*{timeCardRecordDto} == null">
+                                                            <form method="POST" th:id="${day} + 'defaultForm'">
+                                                                <input type="text" th:value=${id} name="id" hidden>
+                                                                <input type="date" th:value="${valueDate}" name="dutyDate" hidden>
+                                                                <input type="text" th:value="${user.defaultStartTime}" name="startTime" th:id="${textDate} + 'defaultStart'" hidden>
+                                                                <input type="text" th:value="${user.defaultEndTime}" name="endTime" th:id="${textDate} + 'defaultEnd'" hidden>
+                                                                <input type="text" th:value="${user.defaultBreakTime}" name="breakTime" th:id="${textDate} + 'defaultBreak'" hidden>
+                                                                <input type="text" value="" name="remarks" hidden>
+                                                                <button type="button" class="btn btn-outline-info btn-xs font-sm py-0 px-2 registerButton"
+                                                                    th:attr="data-id=${day} + 'defaultForm'">通常</button>
+                                                            </form>
+                                                        </td>
+                                                        <!--/* 取消ボタン */-->
+                                                        <td class="col-1" th:unless="*{timeCardRecordDto} == null">
+                                                            <form method="POST" th:id="${day} + 'deleteForm'">
+                                                                <input type="date" th:value="${valueDate}" name="dutyDate" hidden>
+                                                                <button type="button" class="btn btn-outline-danger btn-xs font-sm py-0 px-2 deleteButton"
+                                                                th:attr="data-id=${day} + 'deleteForm'">取消</button>
+                                                            </form>
+                                                        </td>
+                                                        <!-- 編集ボタン -->
+                                                        <td class="col-1">
+                                                            <button type="button" class="btn btn-outline-secondary btn-xs font-sm py-0 px-2" id="edit"
+                                                                data-toggle="modal" data-target="#modalForm" th:attr="data-id=${id},data-date=${valueDate},data-custom=${textDate},data-date-view=${dialogDate},data-week-day=${weekDay},data-remarks=${remarks}">編集</button>
+                                                        </td>
+                                                    </th:block>
+                                                    <!--/* 照会モードだったら */-->
+                                                    <th:block th:if="${action} == 'show'">
+                                                        <td class="col-2"></td>
+                                                    </th:block>
+                                                </th:block>
+                                            </th:block>
+                                        </tr>
+                                    </th:block>
+                                </tbody>
+                            </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ダイアログ -->
+                <div class="modal fade" id="modalForm" tabindex="-1" role="dialog"
+                    aria-labelledby="modalFormTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <!-- ダイアログタイトル -->
+                            <div class="modal-header bg-info text-white">
+                                <h5 class="modal-title" id="modalFormTitle">勤務時間入力ダイアログ</h5>
+                                <!-- ×ボタン -->
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <!-- ダイアログ中身 -->
+                            <div class="modal-body">
+                                <form method="POST" id="dialogForm">
+                                    <!--/* 登録用隠しフォーム */-->
+                                    <input type="text" name="id" id="id" hidden>
+                                    <input type="date" name="dutyDate" id="dutyDate" hidden>
+                                    <!-- 勤務日フォーム -->
+                                    <div class="form-group row">
+                                        <div class="input-group col-12">
+                                            <div class="input-group-prepend">
+                                                <label for="dutyDate" class="input-group-text text-white bg-info label-width">勤務日</label>
+                                            </div>
+                                            <input class="form-control viewDate" type="text" name="dutyDateView" id="dutyDateView" disabled>
+                                        </div>
+                                    </div>
+                                    <!-- 出勤時間フォーム -->
+                                    <div class="form-group row">
+                                        <div class="input-group col-12">
+                                            <div class="input-group-prepend">
+                                                <label for="startTime" class="input-group-text text-white bg-info">出勤時間</label>
+                                            </div>
+                                            <select class="form-control costom-select" name="startTime" id="startTime">
+                                                <option th:each="time,list:${timeList}"
+                                                    th:text="${@helper.timeFormat(time)}"
+                                                    th:value="${time}"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <!-- 退勤時間フォーム -->
+                                    <div class="form-group row">
+                                        <div class="input-group col-12">
+                                            <div class="input-group-prepend">
+                                                <label for="endTime" class="input-group-text text-white bg-info">退勤時間</label>
+                                            </div>
+                                            <select class="form-control costom-select" name="endTime" id="endTime">
+                                                <option th:each="time,list:${timeList}"
+                                                    th:text="${@helper.timeFormat(time + timePeriod)}"
+                                                    th:value="${time + timePeriod}"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <!-- 休憩時間フォーム -->
+                                    <div class="form-group row">
+                                        <div class="input-group col-12">
+                                            <div class="input-group-prepend">
+                                                <label for="breakTime" class="input-group-text text-white bg-info">休憩時間</label>
+                                            </div>
+                                            <select class="form-control costom-select" name="breakTime" id="breakTime">
+                                                <option th:each="time,list:${timeList}"
+                                                    th:text="${@helper.timeFormat(time)}"
+                                                    th:value="${time}"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <!-- 備考エリア -->
+                                    <div class="form-group row">
+                                        <div class="input-group col-12">
+                                            <div class="input-group-prepend">
+                                                <label for="remarks"
+                                                    class="input-group-text text-white bg-info label-width">備考</label>
+                                            </div>
+                                            <textarea class="form-control" name="remarks" id="remarks" cols="10" rows="4"></textarea>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <!-- 閉じるボタン -->
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
+                                <!-- 保存ボタン -->
+                                <button type="button" class="btn btn-info registerButton"
+                                    data-id="dialogForm">保存</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
