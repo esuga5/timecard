@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/timecard
-    username: postgres
-    password: secret
+    url: jdbc:postgres://digskill:Gn7X4oKx7sTjT7amHQWISrZNvmKEKozs@dpg-cchckqcgqg43r3fj0jt0-a.singapore-postgres.render.com/timecard
+    username: digskill
+    password: Gn7X4oKx7sTjT7amHQWISrZNvmKEKozs
     driver-class-name: org.postgresql.Driver
   data:
     web:
@@ -22,4 +22,10 @@ timecard:
   #   url: jdbc:postgresql://ec2-52-202-22-140.compute-1.amazonaws.com
   #   username: dhtsdwykcteynl
   #   password: 8ecb5984d97051cd7b3e14f0c96833a0f3ec2af228f9bb665a69828d90e79f92
+  #   driver-class-name: org.postgresql.Driver
+
+  # datasource:
+  #   url: jdbc:postgresql://localhost:5432/timecard
+  #   username: postgres
+  #   password: secret
   #   driver-class-name: org.postgresql.Driver
